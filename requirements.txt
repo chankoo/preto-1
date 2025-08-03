@@ -1,4 +1,8 @@
 streamlit
 notebook
 nbconvert
+pandas
+plotly
+matplotlib
+seaborn
 faker
