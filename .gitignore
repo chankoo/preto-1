@@ -126,3 +126,7 @@ dmypy.json
 .vscode/
 *.swp
 *.swo
+
+
+# ETC
+.DS_Store

@@ -1,3 +1,4 @@
 streamlit
 notebook
 nbconvert
+faker
