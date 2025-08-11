@@ -29,6 +29,4 @@ EXPOSE 8501 8888
 RUN chmod +x start.sh
 
 # Command to run the app
-# CMD ["./start.sh"]
-
-CMD ["tail", "-f", "/dev/null"]
+CMD ["./start.sh"]
