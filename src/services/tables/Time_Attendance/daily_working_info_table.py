@@ -7,6 +7,7 @@
 import pandas as pd
 import numpy as np
 import datetime
+import random
 from datetime import date, timedelta
 
 # --- 1. 사전 준비 ---
