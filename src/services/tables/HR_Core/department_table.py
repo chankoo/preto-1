@@ -5,18 +5,17 @@
 
 
 import pandas as pd
+import numpy as np
+import datetime
 from datetime import date, timedelta
 import random
 
-
-# In[ ]:
-
-
-# --- 1. DEPARTMENT TABLE --- (부서관리)
+# ==============================================================================
+# --- 1. DEPARTMENT TABLE (부서관리) ---
+# ==============================================================================
 
 # --- 1. 기본 정보 정의 ---
-company_founding_date = date(2010, 1, 1)
-
+company_founding_date = datetime.date(2010, 1, 1)
 base_structure = [
     # Level 1
     {"DEP_ID": "DEP001", "DEP_NAME": "Headquarters", "UP_DEP_ID": None, "DEPT_TYPE": "본사"},
@@ -62,13 +61,6 @@ base_structure = [
 # --- 2. 초기 DataFrame 생성 ---
 departments = []
 dep_dates = {"DEP001": company_founding_date}
-
-def make_row(dep_id, name, up_id, dept_type, start_date, end_date=None, use_yn='Y'):
-    return {
-        "DEP_ID": dep_id, "DEP_NAME": name, "UP_DEP_ID": up_id, "DEPT_TYPE": dept_type,
-        "DEP_REL_START_DATE": start_date, "DEP_REL_END_DATE": end_date, "DEP_USE_YN": use_yn
-    }
-
 for dep in base_structure:
     dep_id, up_id, dept_type = dep["DEP_ID"], dep["UP_DEP_ID"], dep["DEPT_TYPE"]
     if up_id is None:
@@ -77,14 +69,13 @@ for dep in base_structure:
         parent_date = dep_dates.get(up_id, company_founding_date)
         rel_start = parent_date + timedelta(days=random.randint(0, 300))
     dep_dates[dep_id] = rel_start
-    departments.append(make_row(dep_id, dep["DEP_NAME"], up_id, dept_type, rel_start, use_yn="Y"))
-
+    departments.append({
+        "DEP_ID": dep_id, "DEP_NAME": dep["DEP_NAME"], "UP_DEP_ID": up_id, "DEPT_TYPE": dept_type,
+        "DEP_REL_START_DATE": rel_start, "DEP_REL_END_DATE": None, "DEP_USE_YN": "Y"
+    })
 department_df = pd.DataFrame(departments)
 
 # --- 3. DEP_LEVEL 컬럼 추가 ---
-dept_structure_for_level_calc = department_df[['DEP_ID', 'UP_DEP_ID']].drop_duplicates()
-parent_map = dept_structure_for_level_calc.set_index('DEP_ID')['UP_DEP_ID'].to_dict()
-
 def calculate_dep_level(dep_id, p_map):
     level = 1
     current_id = dep_id
@@ -94,11 +85,11 @@ def calculate_dep_level(dep_id, p_map):
         if level > 10: return -1
     return level
 
-dept_level_map = {dep_id: calculate_dep_level(dep_id, parent_map) for dep_id in dept_structure_for_level_calc['DEP_ID']}
-department_df['DEP_LEVEL'] = department_df['DEP_ID'].map(dept_level_map)
+temp_parent_map = department_df.set_index('DEP_ID')['UP_DEP_ID'].to_dict()
+dept_level_map_temp = {dep_id: calculate_dep_level(dep_id, temp_parent_map) for dep_id in department_df['DEP_ID']}
+department_df['DEP_LEVEL'] = department_df['DEP_ID'].map(dept_level_map_temp)
 
 # --- 4. 최종 데이터 타입 정리 ---
-# 원본 DataFrame (분석용)
 department_df['DEP_REL_START_DATE'] = pd.to_datetime(department_df['DEP_REL_START_DATE'])
 department_df['DEP_REL_END_DATE'] = pd.to_datetime(department_df['DEP_REL_END_DATE'], errors='coerce')
 department_df['DEP_LEVEL'] = department_df['DEP_LEVEL'].astype(int)
@@ -107,20 +98,22 @@ department_df = department_df[final_cols]
 
 # --- 5. Google Sheets용 복사본 생성 및 가공 ---
 department_df_for_gsheet = department_df.copy()
-# 날짜를 'YYYY-MM-DD' 문자열로 변환
 department_df_for_gsheet['DEP_REL_START_DATE'] = department_df_for_gsheet['DEP_REL_START_DATE'].dt.strftime('%Y-%m-%d')
 department_df_for_gsheet['DEP_REL_END_DATE'] = department_df_for_gsheet['DEP_REL_END_DATE'].dt.strftime('%Y-%m-%d')
-
-# 모든 컬럼을 문자열로 변환하고 정리
 for col in department_df_for_gsheet.columns:
     department_df_for_gsheet[col] = department_df_for_gsheet[col].astype(str)
-department_df_for_gsheet = department_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
+department_df_for_gsheet = department_df_for_gsheet.replace({'None':'', 'nan':'', 'NaT':''})
 
-
-
-# In[ ]:
-
-
-# --- 결과 확인 ---
-department_df
+# --- 6. 헬퍼 데이터/맵 생성 (다른 테이블/분석에서 사용) ---
+parent_map_dept = department_df.set_index('DEP_ID')['UP_DEP_ID'].to_dict()
+dept_name_map = department_df.set_index('DEP_ID')['DEP_NAME'].to_dict()
+dept_level_map = department_df.set_index('DEP_ID')['DEP_LEVEL'].to_dict()
+hq_id = 'DEP001'
+division_order = ['Planning Division', 'Sales Division', 'Development Division', 'Operating Division']
+office_order = [
+    'Strategy Office', 'Finance Office', 'Planning Division (직속)',
+    'Marketing Office', 'Domestic Sales Office', 'Global Sales Office', 'Sales Division (직속)',
+    'R&D Office', 'QA Office', 'Development Division (직속)',
+    'Engineering Office', 'Production Office', 'Operating Division (직속)'
+]
 

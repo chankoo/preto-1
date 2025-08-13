@@ -6,23 +6,22 @@
 
 import pandas as pd
 import numpy as np
-from datetime import timedelta, datetime
+import datetime
+from datetime import date, timedelta
 import random
 
-
-# In[ ]:
-
-
-# --- 8. CORPORATION/BRANCH TABLE --- (법인/지사관리)
+# ==============================================================================
+# --- 8. CORPORATION/BRANCH TABLE (법인/지사관리) ---
+# ==============================================================================
 
 # --- 1. 기본 정보 및 헬퍼 함수 정의 ---
 random.seed(42)
 
-def random_date(start, end):
+def random_date_for_corp(start, end):
     return start + timedelta(days=random.randint(0, (end - start).days))
 
-start_date = datetime(2010, 1, 1)
-end_date = datetime(2020, 12, 31)
+start_date_corp = datetime.datetime(2010, 1, 1)
+end_date_corp = datetime.datetime(2020, 12, 31)
 
 corp_names = ["NeoTech", "KoreaDynamics", "BlueWave", "MetaSys"]
 branch_pool = [
@@ -35,7 +34,7 @@ branch_pool = [
 corporation_entries = []
 for i, name in enumerate(corp_names, start=1):
     corp_id = f"C{i:02d}"
-    rel_start_date = random_date(start_date, end_date).date()
+    rel_start_date = random_date_for_corp(start_date_corp, end_date_corp).date()
     corporation_entries.append({
         "CORP_ID": corp_id, "CORP_REL_START_DATE": rel_start_date,
         "CORP_NAME": name, "UP_CORP_ID": None, "CORP_USE_YN": "Y",
@@ -49,7 +48,7 @@ selected_branches = random.sample(branch_pool, 6)
 for name in selected_branches:
     branch_id = f"B{branch_id_counter:02d}"
     num_assignments = random.randint(1, 2)
-    start_dates = sorted([random_date(start_date, end_date).date() for _ in range(num_assignments)])
+    start_dates = sorted([random_date_for_corp(start_date_corp, end_date_corp).date() for _ in range(num_assignments)])
     for i in range(num_assignments):
         assigned_corp = random.choice(corporation_entries)
         branches.append({
@@ -67,23 +66,14 @@ corp_branch_df.reset_index(drop=True, inplace=True)
 corp_branch_df['UP_CORP_ID'] = corp_branch_df['UP_CORP_ID'].replace({None: np.nan})
 
 # --- 3. 원본 DataFrame (분석용) ---
-# 날짜 컬럼을 datetime 타입으로 변환
 corp_branch_df['CORP_REL_START_DATE'] = pd.to_datetime(corp_branch_df['CORP_REL_START_DATE'])
 corp_branch_df['CORP_REL_END_DATE'] = pd.to_datetime(corp_branch_df['CORP_REL_END_DATE'], errors='coerce')
 
-
 # --- 4. Google Sheets용 복사본 생성 및 가공 ---
 corp_branch_df_for_gsheet = corp_branch_df.copy()
-# 날짜를 'YYYY-MM-DD' 문자열로 변환
 corp_branch_df_for_gsheet['CORP_REL_START_DATE'] = corp_branch_df_for_gsheet['CORP_REL_START_DATE'].dt.strftime('%Y-%m-%d')
 corp_branch_df_for_gsheet['CORP_REL_END_DATE'] = corp_branch_df_for_gsheet['CORP_REL_END_DATE'].dt.strftime('%Y-%m-%d')
-
-# 모든 컬럼을 문자열로 변환하고 정리
 for col in corp_branch_df_for_gsheet.columns:
     corp_branch_df_for_gsheet[col] = corp_branch_df_for_gsheet[col].astype(str)
 corp_branch_df_for_gsheet = corp_branch_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
-
-
-# --- 결과 확인 (원본 DataFrame 출력) ---
-corp_branch_df
 

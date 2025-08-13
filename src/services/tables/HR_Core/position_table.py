@@ -6,11 +6,9 @@
 
 import pandas as pd
 
-
-# In[ ]:
-
-
-# --- 2. POSITION TABLE --- (직위/직급관리)
+# ==============================================================================
+# --- 2. POSITION TABLE (직위/직급관리) ---
+# ==============================================================================
 
 # --- 1. 기본 데이터 정의 ---
 position_data = [
@@ -34,18 +32,11 @@ for pos in position_data:
         position_rows.append(row)
 
 # --- 3. 원본 DataFrame (분석용) ---
-# 데이터 타입을 그대로 유지
 position_df = pd.DataFrame(position_rows)
-
 
 # --- 4. Google Sheets용 복사본 생성 및 가공 ---
 position_df_for_gsheet = position_df.copy()
-# 모든 컬럼을 문자열로 변환하고 정리
 for col in position_df_for_gsheet.columns:
     position_df_for_gsheet[col] = position_df_for_gsheet[col].astype(str)
 position_df_for_gsheet = position_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
-
-
-# --- 결과 확인 (원본 DataFrame 출력) ---
-position_df
 

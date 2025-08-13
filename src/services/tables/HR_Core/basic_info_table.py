@@ -6,16 +6,14 @@
 
 import pandas as pd
 import numpy as np
-from datetime import timedelta, datetime
+import datetime
+from datetime import date, timedelta
+from faker import Faker
 import random
 
-from faker import Faker
-
-
-# In[ ]:
-
-
-# --- 10. BASIC INFO TABLE --- (기본정보)
+# ==============================================================================
+# --- 10. BASIC INFO TABLE (기본정보) ---
+# ==============================================================================
 
 # --- 1. 사전 준비 ---
 fake_kr = Faker("ko_KR")
@@ -25,7 +23,7 @@ random.seed(42)
 np.random.seed(42)
 
 num_employees = 1000
-today = datetime.now().date()
+today = datetime.datetime.now().date()
 today_ts = pd.to_datetime(today)
 
 # --- 2. 1단계: 모든 직원을 '재직' 상태로 초기 데이터 생성 ---
@@ -35,7 +33,7 @@ for i in range(1, num_employees + 1):
     name = fake_kr.name()
     eng_name = fake_en.name()
     nickname = fake_en.first_name()
-    birth_date = fake_kr.date_of_birth(minimum_age=20, maximum_age=40)
+    birth_date = fake_kr.date_of_birth(minimum_age=25, maximum_age=45)
     birth_str = birth_date.strftime("%y%m%d")
     gender_code = random.choice(["3", "4"]) if birth_date.year >= 2000 else random.choice(["1", "2"])
     gender = "M" if gender_code in ["1", "3"] else "F"
@@ -43,7 +41,7 @@ for i in range(1, num_employees + 1):
     personal_id = f"{birth_str}-{gender_code}{unique_digits}"
     email = fake_en.email()
     phone_num = fake_kr.phone_number()
-    in_date = fake_kr.date_between(start_date="-10y", end_date="-30d")
+    in_date = fake_kr.date_between(start_date="-15y", end_date="-30d")
     group_in_date = in_date
     if random.random() > 0.925:
         group_in_date = in_date - timedelta(days=random.randint(1, 1000))
@@ -90,22 +88,15 @@ emp_df['DURATION'] = (emp_df['OUT_DATE'].fillna(today_ts) - emp_df['IN_DATE']).d
 emp_df['PROB_YN'] = np.where((today_ts - emp_df['IN_DATE']).dt.days <= 90, 'Y', 'N')
 emp_df = emp_df.drop(columns=['TENURE_YEARS', 'LEAVING_PROB'])
 
-# --- 5. 최종 데이터 타입 정리 (원본 DataFrame) ---
-# 분석용 원본 DataFrame은 날짜는 datetime, 숫자는 int로 유지
+# --- 5. 원본 DataFrame (분석용) ---
 emp_df['DURATION'] = emp_df['DURATION'].astype(int)
 
 # --- 6. Google Sheets용 복사본 생성 및 가공 ---
 emp_df_for_gsheet = emp_df.copy()
-# 날짜 컬럼을 'YYYY-MM-DD' 문자열로 변환
 date_cols = ['IN_DATE', 'GROUP_IN_DATE', 'OUT_DATE']
 for col in date_cols:
     emp_df_for_gsheet[col] = emp_df_for_gsheet[col].dt.strftime('%Y-%m-%d')
-
-# 모든 컬럼을 문자열로 변환하고 정리
 for col in emp_df_for_gsheet.columns:
     emp_df_for_gsheet[col] = emp_df_for_gsheet[col].astype(str)
 emp_df_for_gsheet = emp_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
-
-# --- 결과 확인 (원본 DataFrame 출력) ---
-emp_df
 

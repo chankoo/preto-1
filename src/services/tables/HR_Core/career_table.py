@@ -7,11 +7,9 @@
 import pandas as pd
 import random
 
-
-# In[ ]:
-
-
-# --- 6. CAREER TABLE --- (경력관리)
+# ==============================================================================
+# --- 6. CAREER TABLE (경력관리) ---
+# ==============================================================================
 
 # 재현성을 위한 시드 설정
 random.seed(42)
@@ -56,19 +54,12 @@ for i in range(total_companies):
     companies.append(company)
 
 # --- 3. 원본 DataFrame (분석용) ---
-# 데이터 타입을 그대로 유지
 career_df = pd.DataFrame(companies)
 career_df = career_df.sort_values(by='CAREER_COMPANY_ID', ascending=True).reset_index(drop=True)
 
-
 # --- 4. Google Sheets용 복사본 생성 및 가공 ---
 career_df_for_gsheet = career_df.copy()
-# 모든 컬럼을 문자열로 변환하고 정리 (이 테이블은 이미 모두 문자열이지만, 일관성을 위해 추가)
 for col in career_df_for_gsheet.columns:
     career_df_for_gsheet[col] = career_df_for_gsheet[col].astype(str)
 career_df_for_gsheet = career_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
-
-
-# --- 결과 확인 (원본 DataFrame 출력) ---
-career_df
 

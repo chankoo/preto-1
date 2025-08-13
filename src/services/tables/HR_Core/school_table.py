@@ -7,11 +7,9 @@
 import pandas as pd
 import random
 
-
-# In[ ]:
-
-
-# --- 7. SCHOOL TABLE --- (학력관리) - User Specified Revision
+# ==============================================================================
+# --- 7. SCHOOL TABLE (학력관리) ---
+# ==============================================================================
 
 # 재현성을 위한 시드 설정
 random.seed(42)
@@ -111,17 +109,11 @@ for idx, info in enumerate(all_assigned_schools, start=1):
 # --- 3. 원본 DataFrame (분석용) ---
 school_df = pd.DataFrame(schools_final_data)
 school_df = school_df.sort_values(by=["SCHOOL_ID"]).reset_index(drop=True)
-# 데이터 타입을 그대로 유지 (SCHOOL_LEVEL은 int)
 school_df['SCHOOL_LEVEL'] = school_df['SCHOOL_LEVEL'].astype(int)
 
 # --- 4. Google Sheets용 복사본 생성 및 가공 ---
 school_df_for_gsheet = school_df.copy()
-# 모든 컬럼을 문자열로 변환하고 정리
 for col in school_df_for_gsheet.columns:
     school_df_for_gsheet[col] = school_df_for_gsheet[col].astype(str)
 school_df_for_gsheet = school_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
-
-
-# --- 결과 확인 (원본 DataFrame 출력) ---
-school_df
 
