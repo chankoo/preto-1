@@ -5,21 +5,25 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
-DATA_DIR = "src/services/data"
+DATA_DIR = "src/services/tables"
 PROPOSALS_DIR = "src/services/proposals"
 
 
 def get_available_data_tables():
     """
-    Scans the data directory and returns a list of available table names
-    without loading the modules.
+    Recursively scans the data directory and returns a list of available table names
+    (relative to DATA_DIR, without .py extension), including files in subdirectories.
     """
     if not os.path.exists(DATA_DIR):
         return []
     tables = []
-    for filename in os.listdir(DATA_DIR):
-        if filename.endswith(".py") and not filename.startswith("__"):
-            tables.append(os.path.splitext(filename)[0])
+    for root, _, files in os.walk(DATA_DIR):
+        for filename in files:
+            if filename.endswith(".py") and not filename.startswith("__"):
+                # Get relative path from DATA_DIR, remove .py extension, replace os.sep with '/'
+                rel_path = os.path.relpath(os.path.join(root, filename), DATA_DIR)
+                table_name = rel_path[:-3].replace(os.sep, "/")
+                tables.append(table_name)
     return sorted(tables)
 
 
@@ -112,7 +116,7 @@ def main():
         available_tables = get_available_data_tables()
 
         if not available_tables:
-            st.error("No data tables found in the 'src/services/data' directory.")
+            st.error("No data tables found in the 'DATA_DIR' directory.")
             return
 
         selection = st.sidebar.selectbox("Choose a data table", available_tables)
@@ -131,7 +135,7 @@ def main():
         available_proposals = get_available_proposals()
 
         if not available_proposals:
-            st.error("No proposals found in the 'src/services/proposals' directory.")
+            st.error("No proposals found in the 'PROPOSALS_DIR' directory.")
             return
 
         selection = st.sidebar.selectbox("Choose a proposal", available_proposals)
