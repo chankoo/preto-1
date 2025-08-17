@@ -26,15 +26,11 @@ import plotly.graph_objects as go
 import plotly.io as pio
 from dateutil.relativedelta import relativedelta
 
-from services.data.jobs import job_df
-from services.data.basic_info import emp_df
-from services.data.careers import career_df
-from services.data.position_info import position_info_df
-from services.data.job_info import job_info_df
-from services.data.department_info import department_info_df
-from services.data.positions import position_df
-from services.data.departments import department_df
-
+from services.tables.HR_Core.position_info_table import position_info_df
+from services.tables.HR_Core.position_table import position_df
+from services.tables.HR_Core.department_info_table import department_info_df
+from services.tables.HR_Core.department_table import department_df
+from services.tables.HR_Core.department_table import division_order
 
 # In[ ]:
 
