@@ -56,12 +56,16 @@ def main():
     # Get the absolute path of the directory where the script is located
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # Define source and destination roots
-    source_dir = os.path.join(script_dir, "notebooks", "tables")
-    dest_dir = os.path.join(script_dir, "src", "services", "data")
-
     # Run the conversion
-    convert_notebooks_in_dir(source_dir, dest_dir)
+    convert_notebooks_in_dir(
+        source_root=os.path.join(script_dir, "notebooks", "tables"),
+        dest_root=os.path.join(script_dir, "src", "services", "tables"),
+    )
+
+    convert_notebooks_in_dir(
+        source_root=os.path.join(script_dir, "notebooks", "proposals"),
+        dest_root=os.path.join(script_dir, "src", "services", "proposals"),
+    )
 
     print("\nConversion process finished.")
 
