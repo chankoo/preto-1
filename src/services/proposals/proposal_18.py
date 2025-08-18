@@ -116,11 +116,10 @@ def create_figure():
 
     return fig
 
-# 이 파일을 직접 실행할 경우 그래프를 생성하여 보여줍니다.
-if __name__ == '__main__':
-    pio.renderers.default = 'vscode'
-    fig = create_figure()
-    fig.show()
+
+pio.renderers.default = 'vscode'
+fig = create_figure()
+fig.show()
 
 
 # In[ ]:
