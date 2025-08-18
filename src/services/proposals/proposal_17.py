@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-
+import plotly.io as pio
 import datetime
 
 # --- 1. 데이터 임포트 ---
@@ -135,9 +135,9 @@ def create_figure():
 
 
 
-    # pio.renderers.default = 'vscode'
-    fig = create_figure()
-    fig.show()
+pio.renderers.default = 'vscode'
+fig = create_figure()
+fig.show()
 
 
 # In[ ]:
