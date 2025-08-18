@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[2]:
 
 
 import pandas as pd
@@ -26,4 +26,10 @@ absence_df_for_gsheet = absence_df.copy()
 for col in absence_df_for_gsheet.columns:
     absence_df_for_gsheet[col] = absence_df_for_gsheet[col].astype(str)
 absence_df_for_gsheet = absence_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
+
+
+# In[ ]:
+
+
+
 

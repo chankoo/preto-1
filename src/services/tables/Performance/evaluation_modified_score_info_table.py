@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -54,4 +54,10 @@ evaluation_modified_score_df_for_gsheet = evaluation_modified_score_df.copy()
 for col in evaluation_modified_score_df_for_gsheet.columns:
     evaluation_modified_score_df_for_gsheet[col] = evaluation_modified_score_df_for_gsheet[col].astype(str)
 evaluation_modified_score_df_for_gsheet = evaluation_modified_score_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
+
+
+# In[ ]:
+
+
+
 

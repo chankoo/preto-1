@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -117,4 +117,10 @@ if not job_info_df_for_gsheet.empty:
     for col in job_info_df_for_gsheet.columns:
         job_info_df_for_gsheet[col] = job_info_df_for_gsheet[col].astype(str)
     job_info_df_for_gsheet = job_info_df_for_gsheet.replace({'None':'', 'NaT':'', 'nan':''})
+
+
+# In[ ]:
+
+
+
 

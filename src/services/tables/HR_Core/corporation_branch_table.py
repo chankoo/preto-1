@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -76,4 +76,10 @@ corp_branch_df_for_gsheet['CORP_REL_END_DATE'] = corp_branch_df_for_gsheet['CORP
 for col in corp_branch_df_for_gsheet.columns:
     corp_branch_df_for_gsheet[col] = corp_branch_df_for_gsheet[col].astype(str)
 corp_branch_df_for_gsheet = corp_branch_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
+
+
+# In[ ]:
+
+
+
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -79,4 +79,10 @@ yearly_payroll_df_for_gsheet = yearly_payroll_df.copy()
 for col in yearly_payroll_df_for_gsheet.columns:
     yearly_payroll_df_for_gsheet[col] = yearly_payroll_df_for_gsheet[col].astype(str)
 yearly_payroll_df_for_gsheet = yearly_payroll_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
+
+
+# In[ ]:
+
+
+
 

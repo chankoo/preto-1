@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -57,4 +57,10 @@ pjt_df_for_gsheet['PJT_END_DATE'] = pjt_df_for_gsheet['PJT_END_DATE'].dt.strftim
 for col in pjt_df_for_gsheet.columns:
     pjt_df_for_gsheet[col] = pjt_df_for_gsheet[col].astype(str)
 pjt_df_for_gsheet = pjt_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
+
+
+# In[ ]:
+
+
+
 

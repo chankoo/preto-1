@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -39,4 +39,10 @@ position_df_for_gsheet = position_df.copy()
 for col in position_df_for_gsheet.columns:
     position_df_for_gsheet[col] = position_df_for_gsheet[col].astype(str)
 position_df_for_gsheet = position_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
+
+
+# In[ ]:
+
+
+
 

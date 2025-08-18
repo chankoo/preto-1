@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -124,4 +124,10 @@ if not pjt_info_df_for_gsheet.empty:
     for col in pjt_info_df_for_gsheet.columns:
         pjt_info_df_for_gsheet[col] = pjt_info_df_for_gsheet[col].astype(str)
     pjt_info_df_for_gsheet = pjt_info_df_for_gsheet.replace({'None':'', 'NaT':'', 'nan':''})
+
+
+# In[ ]:
+
+
+
 

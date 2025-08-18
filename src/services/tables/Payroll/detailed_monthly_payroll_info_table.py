@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -168,4 +168,10 @@ if not detailed_monthly_payroll_df_for_gsheet.empty:
     for col in detailed_monthly_payroll_df_for_gsheet.columns:
         detailed_monthly_payroll_df_for_gsheet[col] = detailed_monthly_payroll_df_for_gsheet[col].astype(str)
     detailed_monthly_payroll_df_for_gsheet = detailed_monthly_payroll_df_for_gsheet.replace({'None':'', 'NaT':'', 'nan':''})
+
+
+# In[ ]:
+
+
+
 

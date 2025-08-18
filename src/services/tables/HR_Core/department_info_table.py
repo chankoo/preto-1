@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -121,4 +121,10 @@ if not department_info_df_for_gsheet.empty:
     for col in department_info_df_for_gsheet.columns:
         department_info_df_for_gsheet[col] = department_info_df_for_gsheet[col].astype(str)
     department_info_df_for_gsheet = department_info_df_for_gsheet.replace({'None':'', 'NaT':'', 'nan':''})
+
+
+# In[ ]:
+
+
+
 

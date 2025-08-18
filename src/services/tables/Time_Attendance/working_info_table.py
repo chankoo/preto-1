@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -88,4 +88,10 @@ if not work_info_df_for_gsheet.empty:
     for col in work_info_df_for_gsheet.columns:
         work_info_df_for_gsheet[col] = work_info_df_for_gsheet[col].astype(str)
     work_info_df_for_gsheet = work_info_df_for_gsheet.replace({'None':'', 'NaT':'', 'nan':''})
+
+
+# In[ ]:
+
+
+
 

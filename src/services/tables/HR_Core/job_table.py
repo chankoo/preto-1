@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -80,4 +80,10 @@ job_df_for_gsheet = job_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''}
 # --- 6. 헬퍼 데이터/맵 생성 (다른 테이블/분석에서 사용) ---
 job_df_indexed = job_df.set_index('JOB_ID')
 parent_map_job = job_df_indexed['UP_JOB_ID'].to_dict()
+
+
+# In[ ]:
+
+
+
 

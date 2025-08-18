@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -87,4 +87,10 @@ if not contract_info_df_for_gsheet.empty:
     for col in contract_info_df_for_gsheet.columns:
         contract_info_df_for_gsheet[col] = contract_info_df_for_gsheet[col].astype(str)
     contract_info_df_for_gsheet = contract_info_df_for_gsheet.replace({'None':'', 'NaT':'', 'nan':''})
+
+
+# In[ ]:
+
+
+
 

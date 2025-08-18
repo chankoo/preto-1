@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -62,4 +62,10 @@ career_df_for_gsheet = career_df.copy()
 for col in career_df_for_gsheet.columns:
     career_df_for_gsheet[col] = career_df_for_gsheet[col].astype(str)
 career_df_for_gsheet = career_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
+
+
+# In[ ]:
+
+
+
 

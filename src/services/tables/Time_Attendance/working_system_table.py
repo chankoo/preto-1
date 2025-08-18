@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -36,4 +36,10 @@ work_sys_df_for_gsheet = work_sys_df.copy()
 for col in work_sys_df_for_gsheet.columns:
     work_sys_df_for_gsheet[col] = work_sys_df_for_gsheet[col].astype(str)
 work_sys_df_for_gsheet = work_sys_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
+
+
+# In[ ]:
+
+
+
 

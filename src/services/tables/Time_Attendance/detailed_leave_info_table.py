@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -109,4 +109,10 @@ if not detailed_leave_info_df_for_gsheet.empty:
     for col in detailed_leave_info_df_for_gsheet.columns:
         detailed_leave_info_df_for_gsheet[col] = detailed_leave_info_df_for_gsheet[col].astype(str)
     detailed_leave_info_df_for_gsheet = detailed_leave_info_df_for_gsheet.replace({'None':'', 'NaT':'', 'nan':''})
+
+
+# In[ ]:
+
+
+
 

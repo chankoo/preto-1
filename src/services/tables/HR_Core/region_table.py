@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -53,4 +53,10 @@ region_df_for_gsheet = region_df.copy()
 for col in region_df_for_gsheet.columns:
     region_df_for_gsheet[col] = region_df_for_gsheet[col].astype(str)
 region_df_for_gsheet = region_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
+
+
+# In[ ]:
+
+
+
 

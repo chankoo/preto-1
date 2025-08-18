@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -35,4 +35,10 @@ leave_type_df_for_gsheet = leave_type_df.copy()
 for col in leave_type_df_for_gsheet.columns:
     leave_type_df_for_gsheet[col] = leave_type_df_for_gsheet[col].astype(str)
 leave_type_df_for_gsheet = leave_type_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
+
+
+# In[ ]:
+
+
+
 

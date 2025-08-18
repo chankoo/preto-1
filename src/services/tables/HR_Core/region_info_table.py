@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -139,4 +139,10 @@ if not region_info_df_for_gsheet.empty:
     for col in region_info_df_for_gsheet.columns:
         region_info_df_for_gsheet[col] = region_info_df_for_gsheet[col].astype(str)
     region_info_df_for_gsheet = region_info_df_for_gsheet.replace({'None':'', 'NaT':'', 'nan':''})
+
+
+# In[ ]:
+
+
+
 

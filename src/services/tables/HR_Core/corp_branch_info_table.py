@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -105,4 +105,10 @@ if not corp_branch_info_df_for_gsheet.empty:
     for col in corp_branch_info_df_for_gsheet.columns:
         corp_branch_info_df_for_gsheet[col] = corp_branch_info_df_for_gsheet[col].astype(str)
     corp_branch_info_df_for_gsheet = corp_branch_info_df_for_gsheet.replace({'None':'', 'NaT':'', 'nan':''})
+
+
+# In[ ]:
+
+
+
 

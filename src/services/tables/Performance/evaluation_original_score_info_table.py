@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -127,4 +127,10 @@ if not evaluation_original_score_df_for_gsheet.empty:
     for col in evaluation_original_score_df_for_gsheet.columns:
         evaluation_original_score_df_for_gsheet[col] = evaluation_original_score_df_for_gsheet[col].astype(str)
     evaluation_original_score_df_for_gsheet = evaluation_original_score_df_for_gsheet.replace({'None':'', 'nan':'', 'NaT':''})
+
+
+# In[ ]:
+
+
+
 

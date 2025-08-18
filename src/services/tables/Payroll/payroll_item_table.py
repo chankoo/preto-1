@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -48,4 +48,10 @@ payroll_item_df_for_gsheet = payroll_item_df.copy()
 for col in payroll_item_df_for_gsheet.columns:
     payroll_item_df_for_gsheet[col] = payroll_item_df_for_gsheet[col].astype(str)
 payroll_item_df_for_gsheet = payroll_item_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
+
+
+# In[ ]:
+
+
+
 

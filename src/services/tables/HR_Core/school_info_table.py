@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -127,4 +127,10 @@ if not school_info_df_for_gsheet.empty:
     for col in school_info_df_for_gsheet.columns:
         school_info_df_for_gsheet[col] = school_info_df_for_gsheet[col].astype(str)
     school_info_df_for_gsheet = school_info_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
+
+
+# In[ ]:
+
+
+
 

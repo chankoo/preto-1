@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -99,4 +99,10 @@ for col in date_cols:
 for col in emp_df_for_gsheet.columns:
     emp_df_for_gsheet[col] = emp_df_for_gsheet[col].astype(str)
 emp_df_for_gsheet = emp_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
+
+
+# In[ ]:
+
+
+
 

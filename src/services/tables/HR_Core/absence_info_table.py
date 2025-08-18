@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -108,4 +108,10 @@ if not absence_info_df_for_gsheet.empty:
     for col in absence_info_df_for_gsheet.columns:
         absence_info_df_for_gsheet[col] = absence_info_df_for_gsheet[col].astype(str)
     absence_info_df_for_gsheet = absence_info_df_for_gsheet.replace({'None':'', 'NaT':'', 'nan':''})
+
+
+# In[ ]:
+
+
+
 

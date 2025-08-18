@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -116,4 +116,10 @@ office_order = [
     'R&D Office', 'QA Office', 'Development Division (직속)',
     'Engineering Office', 'Production Office', 'Operating Division (직속)'
 ]
+
+
+# In[ ]:
+
+
+
 

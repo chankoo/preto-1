@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import pandas as pd
@@ -84,4 +84,10 @@ daily_work_info_df_for_gsheet['DATE'] = daily_work_info_df_for_gsheet['DATE'].dt
 for col in daily_work_info_df_for_gsheet.columns:
     daily_work_info_df_for_gsheet[col] = daily_work_info_df_for_gsheet[col].astype(str)
 daily_work_info_df_for_gsheet = daily_work_info_df_for_gsheet.replace({'None':'', 'NaT':'', 'nan':''})
+
+
+# In[ ]:
+
+
+
 
