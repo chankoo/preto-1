@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[4]:
 
 
 import pandas as pd
@@ -41,22 +41,22 @@ parent_map_df_for_func = department_df[['DEP_ID', 'UP_DEP_ID']]
 if not assignable_departments_df.empty:
     for _, emp_row in emp_df.iterrows():
         emp_id, in_date, out_date = emp_row['EMP_ID'], emp_row['IN_DATE'].date(), emp_row['OUT_DATE'].date() if pd.notna(emp_row['OUT_DATE']) else None
-        
+
         current_start_date = in_date
         num_assignments = random.randint(1, 5)
         last_dept_id = None
-        
+
         for i in range(num_assignments):
             if (out_date and current_start_date > out_date) or (current_start_date > today): break
-            
+
             candidate_depts = assignable_departments_df
-            
+
             # --- 수정된 부분: 첫 부서 배정 로직 수정 ---
             if i == 0: # 첫 부서 배정 시
                 # 4개 Division 중 하나를 무작위로 선택
                 chosen_division_name = random.choice(division_order)
                 division_id = department_df[department_df['DEP_NAME'] == chosen_division_name]['DEP_ID'].iloc[0]
-                
+
                 # 해당 Division의 모든 하위 부서(팀/오피스)를 후보로 설정
                 descendant_ids = get_all_descendants(division_id, parent_map_df_for_func)
                 if descendant_ids:
@@ -73,15 +73,15 @@ if not assignable_departments_df.empty:
                             div_members_df = department_df[department_df['DEP_ID'].isin(all_member_ids)]
                             if not div_members_df.empty:
                                 candidate_depts = div_members_df
-            
+
             dept_row = candidate_depts.sample(n=1).iloc[0]
-            
+
             end_date = out_date if i == num_assignments - 1 else find_next_quarter_start(current_start_date + timedelta(days=random.randint(365, 2 * 365))) - timedelta(days=1)
             if out_date and end_date > out_date: end_date = out_date
             if end_date and end_date > today: end_date = today
 
             base_assignment_records.append({'EMP_ID': emp_id, 'DEP_ID': dept_row['DEP_ID'], 'DEP_APP_START_DATE': current_start_date, 'DEP_APP_END_DATE': end_date})
-            
+
             last_dept_id = dept_row['DEP_ID']
             if end_date is None or end_date >= (out_date or today): break
             current_start_date = end_date + timedelta(days=1)

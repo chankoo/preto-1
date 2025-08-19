@@ -124,8 +124,6 @@ def create_figure():
 
     return fig
 
-
-
 pio.renderers.default = 'vscode'
 fig = create_figure()
 fig.show()
