@@ -81,6 +81,9 @@ job_df_for_gsheet = job_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''}
 job_df_indexed = job_df.set_index('JOB_ID')
 parent_map_job = job_df_indexed['UP_JOB_ID'].to_dict()
 
+job_l1_order = ['IT', 'Management Support', 'Planning', 'Production & Engineering', 'Sales & Marketing']
+job_l2_order = ['SW Developer', 'Infrastructure', 'Data Scientist', 'HR', 'Finance', 'Business Planning', 'Production Management', 'Engineering', 'Marketing', 'Sales']
+
 
 # In[ ]:
 

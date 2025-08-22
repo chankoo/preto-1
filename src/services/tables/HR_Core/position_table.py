@@ -40,6 +40,10 @@ for col in position_df_for_gsheet.columns:
     position_df_for_gsheet[col] = position_df_for_gsheet[col].astype(str)
 position_df_for_gsheet = position_df_for_gsheet.replace({'None': '', 'nan': '', 'NaT': ''})
 
+# --- 5. 헬퍼 데이터 생성 (다른 테이블/분석에서 사용) ---
+position_order = ['Staff', 'Manager', 'Director', 'C-Level']
+grade_order = ['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7']
+
 
 # In[ ]:
 
