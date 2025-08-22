@@ -56,6 +56,23 @@ def get_level1_ancestor(job_id, df_indexed, p_map):
     except KeyError:
         return None
 
+def get_level2_ancestor(job_id, df_indexed, p_map):
+    """직무 ID의 상위(L2) 조상 JOB_ID를 찾는 함수 (p_map 사용)"""
+    if pd.isna(job_id): return None
+    try:
+        level = df_indexed.loc[job_id, 'JOB_LEVEL']
+        current_id = job_id
+        # 현재 레벨이 2보다 높고 부모가 존재하면, 계속 부모를 찾아 올라감
+        depth = 0 # 무한 루프 방지
+        while level > 2 and pd.notna(p_map.get(current_id)) and depth < 5:
+            current_id = p_map.get(current_id)
+            level = df_indexed.loc[current_id, 'JOB_LEVEL']
+            depth += 1
+        # 최종적으로 레벨 2에 도달했다면 ID 반환, 아니면 None 반환
+        return current_id if level == 2 else None
+    except KeyError:
+        return None
+
 def find_division_name_for_dept(dep_id, dept_level_map, parent_map_dept, dept_name_map):
     """부서 ID에서 Division 이름만 찾아주는 간소화된 함수 (find_parents 호출)"""
     return find_parents(dep_id, dept_level_map, parent_map_dept, dept_name_map)['DIVISION_NAME']
