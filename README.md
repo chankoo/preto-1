@@ -38,22 +38,6 @@
     >   ```
 
 
-## 설정
-Jupyter Notebook로 작업한 결과를 streamlit으로 서빙합니다. 이를 위해 jupyter와 streamlit 프로세스를 각각 실행하는 쉘 스크립트를 작성했습니다.
-
-```bash
-[start.sh]
-#!/bin/bash
-
-# Set the PYTHONPATH to include the src directory
-export PYTHONPATH="${PYTHONPATH}:/app/src"
-
-# Start Jupyter Notebook using the config file
-jupyter notebook --config=/app/jupyter_notebook_config.py &
-
-# Start Streamlit app
-streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
-```
 
 ## 사용 방법
 

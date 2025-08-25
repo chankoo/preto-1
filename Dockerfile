@@ -25,8 +25,8 @@ COPY jupyter_notebook_config.py /root/.jupyter/
 # Expose streamlit and jupyter ports
 EXPOSE 8501 8888
 
-# Make start script executable
-RUN chmod +x start.sh
+# Make scripts executable
+RUN chmod +x scripts/start.sh scripts/sync-markdown.sh
 
 # Command to run the app
-CMD ["./start.sh"]
+CMD ["./scripts/start.sh"]
