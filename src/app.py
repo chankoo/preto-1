@@ -22,6 +22,27 @@ def get_available_proposals():
 
 
 @st.cache_data
+def load_markdown_content(proposal_name: str):
+    """
+    Loads markdown content for a proposal if it exists.
+    Returns the content as a string or None if not found.
+    """
+    # Try different markdown file patterns
+    possible_names = [f"{proposal_name}_instruction.md", f"{proposal_name}.md"]
+
+    for md_name in possible_names:
+        md_path = os.path.join(PROPOSALS_DIR, md_name)
+        if os.path.exists(md_path):
+            try:
+                with open(md_path, "r", encoding="utf-8") as f:
+                    return f.read()
+            except Exception as e:
+                st.error(f"Error reading markdown file {md_name}: {e}")
+
+    return None
+
+
+@st.cache_data
 def load_proposal_figure(proposal_name: str):
     """
     Dynamically imports the specified proposal module and returns its figure.
@@ -69,8 +90,15 @@ def main():
 
     if selection:
         st.title(f"Proposal: {selection}")
-        fig = load_proposal_figure(selection)
 
+        # Load and display markdown content if available
+        md_content = load_markdown_content(selection)
+        if md_content:
+            st.markdown(md_content)
+            st.divider()
+
+        # Load and display figure
+        fig = load_proposal_figure(selection)
         if fig is not None:
             if isinstance(fig, plt.Figure):
                 st.pyplot(fig)
