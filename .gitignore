@@ -130,6 +130,3 @@ dmypy.json
 
 # ETC
 .DS_Store
-
-# 특정 폴더의 심볼릭 링크된 instruction 파일 모두 무시
-src/services/proposals/*_instruction.md
