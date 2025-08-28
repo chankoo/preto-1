@@ -27,29 +27,28 @@ if [ ! -d "$PROPOSALS_DIR" ]; then
     exit 1
 fi
 
-# Remove existing symbolic links to .md files in target directory
-echo "🧹 Cleaning existing markdown symbolic links..."
-find "$PROPOSALS_DIR" -name "*.md" -type l -delete 2>/dev/null || true
+# Remove existing .md files in target directory
+echo "🧹 Cleaning existing markdown files..."
+find "$PROPOSALS_DIR" -name "*.md" -delete 2>/dev/null || true
 
-# Create new symbolic links
-echo "🔗 Creating symbolic links..."
-cd "$PROPOSALS_DIR"
+# Copy markdown files
+echo "📄 Copying markdown files..."
 
-LINK_COUNT=0
+COPY_COUNT=0
 for md_file in "$NOTEBOOKS_DIR"/*.md; do
     if [ -f "$md_file" ]; then
         filename=$(basename "$md_file")
-        # Create relative symbolic link
-        ln -sf "../../../notebooks/proposals/$filename" "$filename"
+        # Copy file to target directory
+        cp "$md_file" "$PROPOSALS_DIR/$filename"
         echo "   ✓ $filename"
-        LINK_COUNT=$((LINK_COUNT + 1))
+        COPY_COUNT=$((COPY_COUNT + 1))
     fi
 done
 
-if [ $LINK_COUNT -eq 0 ]; then
+if [ $COPY_COUNT -eq 0 ]; then
     echo "⚠️  No markdown files found in $NOTEBOOKS_DIR"
 else
-    echo "✅ Successfully created $LINK_COUNT symbolic links"
+    echo "✅ Successfully copied $COPY_COUNT markdown files"
 fi
 
 echo "🎉 Markdown sync completed!"
