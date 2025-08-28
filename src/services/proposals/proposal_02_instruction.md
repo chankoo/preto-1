@@ -1,1 +1,0 @@
-../../../notebooks/proposals/proposal_02_instruction.md

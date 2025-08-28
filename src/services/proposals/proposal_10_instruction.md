@@ -1,1 +1,0 @@
-../../../notebooks/proposals/proposal_10_instruction.md
