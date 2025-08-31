@@ -209,9 +209,9 @@ def main():
                     elif isinstance(fig, go.Figure):
                         st.plotly_chart(fig)
                 else:
-                    st.write("Could not load or find a figure for the selected proposal.")
-            else:
-                st.info("개요 페이지입니다. 그래프는 다른 타입에서 확인하실 수 있습니다.")
+                    st.write(
+                        "Could not load or find a figure for the selected proposal."
+                    )
 
 
 if __name__ == "__main__":
