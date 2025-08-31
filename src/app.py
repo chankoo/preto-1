@@ -110,15 +110,16 @@ def load_markdown_content(category: str, subtype: str):
 
 
 @st.cache_data
-def load_proposal_figure(category: str, subtype: str):
+def load_proposal_data(category: str, subtype: str):
     """
-    Dynamically imports the specified proposal module and returns its figure.
+    Dynamically imports the specified proposal module and returns its figure and aggregate_df.
+    Returns a tuple (figure, aggregate_df). aggregate_df is None if not available.
     The result is cached to prevent reloading.
     """
     # Determine the module file based on category and subtype
     if subtype == "개요":
         # For 개요, no figure is expected (only markdown)
-        return None
+        return None, None
     elif subtype in ["부서별", "직무별", "직위직급별", "기본"]:
         # Try specific subtype file first
         module_filename = f"{category}_{subtype}.py"
@@ -135,7 +136,7 @@ def load_proposal_figure(category: str, subtype: str):
 
     if not os.path.exists(module_path):
         st.warning(f"No module file found for {category}_{subtype}")
-        return None
+        return None, None
 
     try:
         # Create a unique module name to avoid conflicts
@@ -143,24 +144,45 @@ def load_proposal_figure(category: str, subtype: str):
         spec = importlib.util.spec_from_file_location(module_name, module_path)
         if spec is None or spec.loader is None:
             st.error(f"Could not create module spec for {module_filename}.")
-            return None
+            return None, None
 
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
-        # Find the first attribute that is a matplotlib or plotly figure.
-        for attr_name in dir(module):
-            if not attr_name.startswith("_"):
-                attr = getattr(module, attr_name)
-                if isinstance(attr, (plt.Figure, go.Figure)):
-                    return attr
+        # Try to find create_figure_and_df function first (returns both figure and aggregate_df)
+        if hasattr(module, 'create_figure_and_df'):
+            result = module.create_figure_and_df()
+            if isinstance(result, tuple) and len(result) == 2:
+                fig, aggregate_df = result
+                if isinstance(fig, (plt.Figure, go.Figure)):
+                    return fig, aggregate_df
+            else:
+                st.warning(f"create_figure_and_df in {module_filename} should return a tuple (figure, aggregate_df)")
+                return None, None
+        
+        # If create_figure_and_df not found, try create_figure function
+        elif hasattr(module, 'create_figure'):
+            fig = module.create_figure()
+            if isinstance(fig, (plt.Figure, go.Figure)):
+                return fig, None
+            else:
+                st.warning(f"create_figure in {module_filename} should return a figure")
+                return None, None
+        
+        # Fallback: Find the first attribute that is a matplotlib or plotly figure
+        else:
+            for attr_name in dir(module):
+                if not attr_name.startswith("_"):
+                    attr = getattr(module, attr_name)
+                    if isinstance(attr, (plt.Figure, go.Figure)):
+                        return attr, None
 
-        st.warning(f"No figure found in module: {module_filename}")
-        return None
+            st.warning(f"No figure or create_figure/create_figure_and_df function found in module: {module_filename}")
+            return None, None
 
     except Exception as e:
-        st.error(f"Error loading figure from {module_filename}: {e}")
-        return None
+        st.error(f"Error loading data from {module_filename}: {e}")
+        return None, None
 
 
 def main():
@@ -200,14 +222,19 @@ def main():
                 st.markdown(md_content)
                 st.divider()
 
-            # Load and display figure (not for 개요)
+            # Load and display figure and aggregate_df (not for 개요)
             if selected_subtype != "개요":
-                fig = load_proposal_figure(selected_category, selected_subtype)
+                fig, aggregate_df = load_proposal_data(selected_category, selected_subtype)
                 if fig is not None:
                     if isinstance(fig, plt.Figure):
                         st.pyplot(fig)
                     elif isinstance(fig, go.Figure):
                         st.plotly_chart(fig)
+                    
+                    # Display aggregate_df if available
+                    if aggregate_df is not None:
+                        st.subheader("데이터 테이블")
+                        st.dataframe(aggregate_df, use_container_width=True)
                 else:
                     st.write(
                         "Could not load or find a figure for the selected proposal."
