@@ -1,0 +1,135 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
+import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
+import plotly.io as pio
+import datetime
+
+# --- 1. 데이터 임포트 ---
+from services.tables.HR_Core.basic_info_table import emp_df
+from services.tables.HR_Core.department_info_table import department_info_df
+from services.tables.HR_Core.job_info_table import job_info_df
+from services.tables.HR_Core.job_table import job_df, job_df_indexed, parent_map_job, job_l1_order
+from services.helpers.utils import get_level1_ancestor
+
+def create_cohort_data(df):
+    """
+    주어진 데이터프레임에 대한 코호트 데이터를 생성합니다.
+    """
+    df = df.copy()
+    if df.empty:
+        return pd.DataFrame()
+
+    today = datetime.datetime.now()
+    df['HIRE_YEAR'] = df['IN_DATE'].dt.year
+    df['TENURE_YEAR_INDEX'] = np.floor(
+        (df['OUT_DATE'].fillna(pd.to_datetime(today)) - df['IN_DATE']).dt.days / 365.25
+    ).astype(int)
+
+    cohort_data_list = []
+    for _, row in df.iterrows():
+        if pd.isna(row['HIRE_YEAR']) or pd.isna(row['TENURE_YEAR_INDEX']): continue
+        for i in range(row['TENURE_YEAR_INDEX'] + 1):
+            cohort_data_list.append({
+                'HIRE_YEAR': int(row['HIRE_YEAR']), 'TENURE_YEAR': i, 'EMP_ID': row['EMP_ID']
+            })
+
+    if not cohort_data_list: return pd.DataFrame()
+
+    cohort_df = pd.DataFrame(cohort_data_list)
+    cohort_counts = cohort_df.groupby(['HIRE_YEAR', 'TENURE_YEAR'])['EMP_ID'].nunique().unstack()
+
+    if cohort_counts.empty: return pd.DataFrame()
+
+    cohort_sizes = cohort_counts.iloc[:, 0]
+    cohort_retention = cohort_counts.divide(cohort_sizes, axis=0) * 100
+
+    current_year = today.year
+    for hire_year in cohort_retention.index:
+        max_completed_tenure = current_year - hire_year - 1
+        cohort_retention.loc[hire_year, cohort_retention.columns > max_completed_tenure] = np.nan
+
+    return cohort_retention
+
+def create_figure():
+    """
+    제안 6-2: 직무별 입사 연도 잔존율 코호트 분석 그래프를 생성합니다.
+    """
+    # --- 2. 데이터 준비 및 가공 ---
+    first_job = job_info_df.sort_values('JOB_APP_START_DATE').groupby('EMP_ID').first().reset_index()
+    job_name_map = job_df.set_index('JOB_ID')['JOB_NAME'].to_dict()
+    first_job['JOB_L1_NAME'] = first_job['JOB_ID'].apply(lambda x: job_name_map.get(get_level1_ancestor(x, job_df_indexed, parent_map_job)))
+
+    analysis_df = emp_df[['EMP_ID', 'IN_DATE', 'OUT_DATE']].copy()
+    analysis_df = pd.merge(analysis_df, first_job[['EMP_ID', 'JOB_L1_NAME']], on='EMP_ID', how='left')
+    analysis_df = analysis_df.dropna(subset=['JOB_L1_NAME'])
+
+    # --- 3. Plotly 인터랙티브 그래프 생성 ---
+    fig = go.Figure()
+    job_list = ['전체'] + job_l1_order
+
+    cohort_data_map = {}
+    for job_name in job_list:
+        df_filtered = analysis_df if job_name == '전체' else analysis_df[analysis_df['JOB_L1_NAME'] == job_name]
+        cohort_data_map[job_name] = create_cohort_data(df_filtered)
+
+    for job_name in job_list:
+        cohort_pivot = cohort_data_map[job_name]
+        if not cohort_pivot.empty:
+            text_labels = cohort_pivot.map(lambda x: f'{x:.0f}%' if pd.notna(x) else '')
+            fig.add_trace(
+                go.Heatmap(
+                    z=cohort_pivot.values,
+                    x=[f"{int(c)}년차" for c in cohort_pivot.columns],
+                    y=cohort_pivot.index,
+                    colorscale='Blues',
+                    text=text_labels,
+                    texttemplate="%{text}",
+                    showscale=False,
+                    visible=(job_name == '전체'),
+                    connectgaps=False
+                )
+            )
+        else: # 데이터가 없는 경우 빈 히트맵 트레이스 추가
+             fig.add_trace(go.Heatmap(visible=(job_name == '전체')))
+
+    # --- 4. 드롭다운 메뉴 및 레이아웃 업데이트 ---
+    buttons = []
+    for i, job_name in enumerate(job_list):
+        visibility_mask = [False] * len(job_list)
+        visibility_mask[i] = True
+        buttons.append(
+            dict(label=job_name, method='update', args=[{'visible': visibility_mask}])
+        )
+
+    fig.update_layout(
+        updatemenus=[dict(
+            active=0, buttons=buttons, direction="down",
+            pad={"r": 10, "t": 10}, showactive=True,
+            x=0.01, xanchor="left", y=1.1, yanchor="top"
+        )],
+        title_text='직무별 입사 연도 잔존율 코호트 분석',
+        xaxis_title='근속년수',
+        yaxis_title='입사 연도 (코호트)',
+        font_size=14, height=700,
+        annotations=[dict(text="직무 선택:", showarrow=False, x=0, y=1.08, yref="paper", align="left")]
+    )
+
+    return fig
+
+# 이 파일을 직접 실행할 경우 그래프를 생성하여 보여줍니다.
+pio.renderers.default = 'vscode'
+fig = create_figure()
+fig.show()
+
+
+# In[ ]:
+
+
+
+
