@@ -11,24 +11,40 @@ PROPOSALS_DIR = "src/services/proposals"
 def get_proposal_categories():
     """
     Scans the proposals directory and returns a list of unique proposal categories.
-    Categories are the base proposal names (e.g., 'proposal_01', 'basic_proposal_02').
+    Categories are the base proposal names (e.g., 'proposal_01', 'basic_proposal').
     """
     if not os.path.exists(PROPOSALS_DIR):
         return []
     
     categories = set()
     for filename in os.listdir(PROPOSALS_DIR):
-        if filename.endswith(".py") and not filename.startswith("__"):
+        if filename.endswith((".py", ".md")) and not filename.startswith("__"):
             name = os.path.splitext(filename)[0]
-            # Extract base category (everything before the last underscore if it's a subtype)
-            if "_부서별" in name or "_직무별" in name or "_직위직급별" in name or "_기본" in name:
-                # Find the last occurrence of these patterns and extract the base
-                for pattern in ["_부서별", "_직무별", "_직위직급별", "_기본"]:
-                    if name.endswith(pattern):
-                        categories.add(name[:-len(pattern)])
-                        break
+            
+            # Extract base category from filename patterns
+            if name.startswith("basic_proposal"):
+                if "_" in name[len("basic_proposal"):]:
+                    # Has subtype (e.g., basic_proposal_부서별)
+                    categories.add("basic_proposal")
+                else:
+                    # Base file (e.g., basic_proposal.py) - shouldn't exist but handle it
+                    categories.add(name)
+            elif name.startswith("proposal_"):
+                # Extract proposal number (e.g., proposal_01, proposal_01_부서별)
+                parts = name.split("_")
+                if len(parts) >= 2:
+                    # proposal_XX or proposal_XX_subtype
+                    category = "_".join(parts[:2])  # proposal_01
+                    categories.add(category)
             else:
-                categories.add(name)
+                # Other files without standard pattern
+                if "_" in name:
+                    # Assume format: category_subtype
+                    category = name.rsplit("_", 1)[0]
+                    categories.add(category)
+                else:
+                    # Base file
+                    categories.add(name)
     
     return sorted(list(categories))
 
@@ -43,38 +59,32 @@ def get_proposal_subtypes(category):
     
     subtypes = set()
     
-    # Check for markdown files (개요)
-    md_patterns = [f"{category}_개요.md"]
-    for pattern in md_patterns:
-        if os.path.exists(os.path.join(PROPOSALS_DIR, pattern)):
-            subtypes.add("개요")
+    # Dynamically scan for all subtypes for this category
+    for filename in os.listdir(PROPOSALS_DIR):
+        if filename.startswith(f"{category}_") and not filename.startswith("__"):
+            name = os.path.splitext(filename)[0]
+            
+            # Extract subtype (everything after category_)
+            subtype = name[len(f"{category}_"):]
+            if subtype:  # Make sure subtype is not empty
+                subtypes.add(subtype)
     
-    # Check for python subtypes
-    py_patterns = [
-        f"{category}_부서별.py",
-        f"{category}_직무별.py", 
-        f"{category}_직위직급별.py",
-        f"{category}_기본.py"
-    ]
-    
-    for pattern in py_patterns:
-        if os.path.exists(os.path.join(PROPOSALS_DIR, pattern)):
-            if pattern.endswith("_부서별.py"):
-                subtypes.add("부서별")
-            elif pattern.endswith("_직무별.py"):
-                subtypes.add("직무별")
-            elif pattern.endswith("_직위직급별.py"):
-                subtypes.add("직위직급별")
-            elif pattern.endswith("_기본.py"):
-                subtypes.add("기본")
-    
-    # If no subtypes found, check for base file
+    # If no subtypes found, check for base file (should add "기본")
     if not subtypes and os.path.exists(os.path.join(PROPOSALS_DIR, f"{category}.py")):
         subtypes.add("기본")
     
     # Sort subtypes in a logical order
-    order = ["개요", "기본", "부서별", "직무별", "직위직급별"]
-    sorted_subtypes = [subtype for subtype in order if subtype in subtypes]
+    priority_order = ["개요", "기본", "부서별", "직무별", "직위직급별"]
+    sorted_subtypes = []
+    
+    # Add priority items first
+    for item in priority_order:
+        if item in subtypes:
+            sorted_subtypes.append(item)
+            subtypes.remove(item)
+    
+    # Add remaining subtypes in alphabetical order
+    sorted_subtypes.extend(sorted(list(subtypes)))
     
     return sorted_subtypes
 
@@ -120,19 +130,25 @@ def load_proposal_data(category: str, subtype: str):
     if subtype == "개요":
         # For 개요, no figure is expected (only markdown)
         return None, None
-    elif subtype in ["부서별", "직무별", "직위직급별", "기본"]:
+    else:
         # Try specific subtype file first
-        module_filename = f"{category}_{subtype}.py"
-        module_path = os.path.join(PROPOSALS_DIR, module_filename)
-        
-        # If specific subtype doesn't exist, try base file
-        if not os.path.exists(module_path):
+        if subtype == "기본":
+            # For 기본, try base file first, then {category}_기본.py
             module_filename = f"{category}.py"
             module_path = os.path.join(PROPOSALS_DIR, module_filename)
-    else:
-        # Default to base file
-        module_filename = f"{category}.py"
-        module_path = os.path.join(PROPOSALS_DIR, module_filename)
+            
+            if not os.path.exists(module_path):
+                module_filename = f"{category}_기본.py"
+                module_path = os.path.join(PROPOSALS_DIR, module_filename)
+        else:
+            # For all other subtypes, try {category}_{subtype}.py
+            module_filename = f"{category}_{subtype}.py"
+            module_path = os.path.join(PROPOSALS_DIR, module_filename)
+            
+            # If specific subtype doesn't exist, try base file as fallback
+            if not os.path.exists(module_path):
+                module_filename = f"{category}.py"
+                module_path = os.path.join(PROPOSALS_DIR, module_filename)
 
     if not os.path.exists(module_path):
         st.warning(f"No module file found for {category}_{subtype}")
