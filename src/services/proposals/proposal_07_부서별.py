@@ -106,7 +106,7 @@ def create_figure_and_df():
 
     # 3. 컬럼 순서 재배치 및 포맷팅
     cols = ['전체 평균'] + [col for col in division_order if col in aggregate_df.columns]
-    aggregate_df = aggregate_df[cols].round(2)
+    aggregate_df = aggregate_df[cols].round(2).fillna('-')
     # --- 수정 완료 ---
 
     return fig, aggregate_df

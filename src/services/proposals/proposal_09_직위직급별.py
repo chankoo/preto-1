@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 
 import pandas as pd
@@ -101,7 +101,7 @@ def create_figure_and_df():
         visibility_mask = [False] * len(fig.data)
         for trace_idx in grade_traces_map.get(pos_name, []):
             visibility_mask[trace_idx] = True
-        buttons.append(dict(label=f'{pos_name} 상세', method='update', args=[{'visible': visibility_mask}, {'title': f'{pos_name} 내 직급별 연간 직무 이동률(%) 변화 추이', 'legend_title_text': '직급'}]))
+        buttons.append(dict(label=f'{pos_name}', method='update', args=[{'visible': visibility_mask}, {'title': f'{pos_name} 내 직급별 연간 직무 이동률(%) 변화 추이', 'legend_title_text': '직급'}]))
     fig.update_layout(
         updatemenus=[dict(active=0, buttons=buttons, direction="down", pad={"r": 10, "t": 10}, showactive=True, x=0.01, xanchor="left", y=1.1, yanchor="top")],
         title_text='직위/직급별 연간 직무 이동률(%) 변화 추이',

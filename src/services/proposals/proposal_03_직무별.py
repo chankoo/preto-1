@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[4]:
 
 
 import pandas as pd
@@ -76,14 +76,14 @@ def create_figure_and_df():
     buttons = []
     buttons.append(dict(label='전체', method='update', 
                         args=[{'visible': [True]*len(job_l1_order) + [False]*(len(fig.data)-len(job_l1_order))},
-                              {'title': '전체 직무의 직위별 연령 분포', 'legend_title_text': 'Job Level 1'}]))
+                              {'title': '전체 직무의 직위별 연령 분포', 'legend_title_text': 'Job Level'}]))
     for job_l1_name in job_l1_order:
         visibility_mask = [False] * len(fig.data)
         for trace_idx in job_l2_traces_map.get(job_l1_name, []):
             visibility_mask[trace_idx] = True
         buttons.append(dict(label=f'{job_l1_name}', method='update',
                             args=[{'visible': visibility_mask},
-                                  {'title': f'{job_l1_name} 내 직위별 연령 분포', 'legend_title_text': 'Job Level 2'}]))
+                                  {'title': f'{job_l1_name} 내 직위별 연령 분포', 'legend_title_text': 'Job Level'}]))
 
     fig.update_layout(
         updatemenus=[dict(
@@ -107,10 +107,17 @@ def create_figure_and_df():
         values='AGE',
         aggfunc='mean',
         observed=False
-    ).round(2)
+    )
 
-    # 행 순서 고정
-    aggregate_df = aggregate_df.reindex(position_order)
+    # 2. '전체 평균' 컬럼 추가
+    aggregate_df['전체 평균'] = analysis_df.groupby('POSITION_NAME', observed=False)['AGE'].mean()
+
+    # 3. 컬럼 순서 재배치
+    cols = ['전체 평균'] + [col for col in job_l1_order if col in aggregate_df.columns]
+    aggregate_df = aggregate_df[cols]
+
+    # 4. 포맷팅
+    aggregate_df = aggregate_df.round(2).fillna('-')
 
     return fig, aggregate_df
 

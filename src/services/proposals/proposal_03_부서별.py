@@ -87,7 +87,7 @@ def create_figure_and_df():
         visibility_mask = [False] * len(fig.data)
         for trace_idx in office_traces_map.get(div_name, []):
             visibility_mask[trace_idx] = True
-        buttons.append(dict(label=f'{div_name} 상세', method='update',
+        buttons.append(dict(label=f'{div_name}', method='update',
                             args=[{'visible': visibility_mask},
                                   {'title': f'{div_name} 내 직위별 연령 분포', 'legend_title_text': 'Office'}]))
     fig.update_layout(
@@ -112,8 +112,17 @@ def create_figure_and_df():
         values='AGE',
         aggfunc='mean',
         observed=False
-    ).round(2)
-    # --- 수정 완료 ---
+    )
+
+    # 2. '전체 평균' 컬럼 추가
+    aggregate_df['전체 평균'] = analysis_df.groupby('POSITION_NAME', observed=False)['AGE'].mean()
+
+    # 3. 컬럼 순서 재배치
+    cols = ['전체 평균'] + [col for col in division_order if col in aggregate_df.columns]
+    aggregate_df = aggregate_df[cols]
+
+    # 4. 포맷팅
+    aggregate_df = aggregate_df.round(2).fillna('-')
 
     return fig, aggregate_df
 

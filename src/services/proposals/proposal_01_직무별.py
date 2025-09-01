@@ -97,10 +97,18 @@ def create_figure_and_df():
         columns='JOB_L1_NAME',
         values='YEARS',
         aggfunc='mean'
-    ).round(2)
+    )
 
+    # 1. '전체 평균' 컬럼 추가
+    aggregate_df['전체 평균'] = df_melted.groupby('PROMOTION_STEP')['YEARS'].mean()
+
+    # 2. 컬럼 순서 재배치
+    cols = ['전체 평균'] + [col for col in job_l1_order if col in aggregate_df.columns]
+    aggregate_df = aggregate_df[cols]
+
+    # 3. 행 순서 지정 및 포맷팅
     promotion_step_order = ['Staff → Manager', 'Manager → Director']
-    aggregate_df = aggregate_df.reindex(promotion_step_order)
+    aggregate_df = aggregate_df.reindex(promotion_step_order).round(2)
 
     return fig, aggregate_df
 

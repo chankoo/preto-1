@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[4]:
+# In[1]:
 
 
 import pandas as pd
@@ -108,7 +108,7 @@ def create_figure_and_df():
     )
     aggregate_df['전체 평균'] = analysis_df.groupby(['JOB_CATEGORY', 'STATUS'], observed=False)['TENURE_YEARS'].mean()
     cols = ['전체 평균'] + [col for col in division_order if col in aggregate_df.columns]
-    aggregate_df = aggregate_df[cols].round(2)
+    aggregate_df = aggregate_df[cols].round(2).fillna('-')
 
     return fig, aggregate_df
 
