@@ -4,6 +4,7 @@ import importlib.util
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+from services.helpers.dict import name_dictionary
 
 PROPOSALS_DIR = "src/services/proposals"
 
@@ -226,7 +227,11 @@ def main():
         return
 
     # First selectbox: Choose proposal category
-    selected_category = st.sidebar.selectbox("그래프 살펴보기", available_categories)
+    selected_category = st.sidebar.selectbox(
+        "그래프 살펴보기", 
+        available_categories,
+        format_func=lambda x: name_dictionary.get(x, x)
+    )
 
     if selected_category:
         # Get available subtypes for the selected category
@@ -240,7 +245,8 @@ def main():
         selected_subtype = st.sidebar.selectbox("하위 내용 선택", available_subtypes)
 
         if selected_subtype:
-            st.title(f"Proposal: {selected_category} - {selected_subtype}")
+            category_display = name_dictionary.get(selected_category, selected_category)
+            st.title(f"{category_display} - {selected_subtype}")
 
             # Load and display markdown content if available (especially for 개요)
             md_content = load_markdown_content(selected_category, selected_subtype)
