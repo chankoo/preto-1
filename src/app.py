@@ -15,15 +15,15 @@ def get_proposal_categories():
     """
     if not os.path.exists(PROPOSALS_DIR):
         return []
-    
+
     categories = set()
     for filename in os.listdir(PROPOSALS_DIR):
         if filename.endswith((".py", ".md")) and not filename.startswith("__"):
             name = os.path.splitext(filename)[0]
-            
+
             # Extract base category from filename patterns
             if name.startswith("basic_proposal"):
-                if "_" in name[len("basic_proposal"):]:
+                if "_" in name[len("basic_proposal") :]:
                     # Has subtype (e.g., basic_proposal_부서별)
                     categories.add("basic_proposal")
                 else:
@@ -45,7 +45,7 @@ def get_proposal_categories():
                 else:
                     # Base file
                     categories.add(name)
-    
+
     return sorted(list(categories))
 
 
@@ -56,36 +56,36 @@ def get_proposal_subtypes(category):
     """
     if not os.path.exists(PROPOSALS_DIR):
         return []
-    
+
     subtypes = set()
-    
+
     # Dynamically scan for all subtypes for this category
     for filename in os.listdir(PROPOSALS_DIR):
         if filename.startswith(f"{category}_") and not filename.startswith("__"):
             name = os.path.splitext(filename)[0]
-            
+
             # Extract subtype (everything after category_)
-            subtype = name[len(f"{category}_"):]
+            subtype = name[len(f"{category}_") :]
             if subtype:  # Make sure subtype is not empty
                 subtypes.add(subtype)
-    
+
     # If no subtypes found, check for base file (should add "기본")
     if not subtypes and os.path.exists(os.path.join(PROPOSALS_DIR, f"{category}.py")):
         subtypes.add("기본")
-    
+
     # Sort subtypes in a logical order
     priority_order = ["개요", "기본", "부서별", "직무별", "직위직급별"]
     sorted_subtypes = []
-    
+
     # Add priority items first
     for item in priority_order:
         if item in subtypes:
             sorted_subtypes.append(item)
             subtypes.remove(item)
-    
+
     # Add remaining subtypes in alphabetical order
     sorted_subtypes.extend(sorted(list(subtypes)))
-    
+
     return sorted_subtypes
 
 
@@ -104,7 +104,7 @@ def load_markdown_content(category: str, subtype: str):
                     return f.read()
             except Exception as e:
                 st.error(f"Error reading markdown file {category}_개요.md: {e}")
-    
+
     # For other subtypes, try legacy patterns as fallback
     possible_names = [f"{category}_instruction.md", f"{category}.md"]
     for md_name in possible_names:
@@ -136,7 +136,7 @@ def load_proposal_data(category: str, subtype: str):
             # For 기본, try base file first, then {category}_기본.py
             module_filename = f"{category}.py"
             module_path = os.path.join(PROPOSALS_DIR, module_filename)
-            
+
             if not os.path.exists(module_path):
                 module_filename = f"{category}_기본.py"
                 module_path = os.path.join(PROPOSALS_DIR, module_filename)
@@ -144,7 +144,7 @@ def load_proposal_data(category: str, subtype: str):
             # For all other subtypes, try {category}_{subtype}.py
             module_filename = f"{category}_{subtype}.py"
             module_path = os.path.join(PROPOSALS_DIR, module_filename)
-            
+
             # If specific subtype doesn't exist, try base file as fallback
             if not os.path.exists(module_path):
                 module_filename = f"{category}.py"
@@ -166,25 +166,27 @@ def load_proposal_data(category: str, subtype: str):
         spec.loader.exec_module(module)
 
         # Try to find create_figure_and_df function first (returns both figure and aggregate_df)
-        if hasattr(module, 'create_figure_and_df'):
+        if hasattr(module, "create_figure_and_df"):
             result = module.create_figure_and_df()
             if isinstance(result, tuple) and len(result) == 2:
                 fig, aggregate_df = result
                 if isinstance(fig, (plt.Figure, go.Figure)):
                     return fig, aggregate_df
             else:
-                st.warning(f"create_figure_and_df in {module_filename} should return a tuple (figure, aggregate_df)")
+                st.warning(
+                    f"create_figure_and_df in {module_filename} should return a tuple (figure, aggregate_df)"
+                )
                 return None, None
-        
+
         # If create_figure_and_df not found, try create_figure function
-        elif hasattr(module, 'create_figure'):
+        elif hasattr(module, "create_figure"):
             fig = module.create_figure()
             if isinstance(fig, (plt.Figure, go.Figure)):
                 return fig, None
             else:
                 st.warning(f"create_figure in {module_filename} should return a figure")
                 return None, None
-        
+
         # Fallback: Find the first attribute that is a matplotlib or plotly figure
         else:
             for attr_name in dir(module):
@@ -193,7 +195,9 @@ def load_proposal_data(category: str, subtype: str):
                     if isinstance(attr, (plt.Figure, go.Figure)):
                         return attr, None
 
-            st.warning(f"No figure or create_figure/create_figure_and_df function found in module: {module_filename}")
+            st.warning(
+                f"No figure or create_figure/create_figure_and_df function found in module: {module_filename}"
+            )
             return None, None
 
     except Exception as e:
@@ -206,8 +210,14 @@ def main():
     Main function to run the Streamlit app.
     """
 
-    st.sidebar.title("Proposals")
-    
+    st.sidebar.title("HR Analytics Graph Collection")
+    st.sidebar.markdown(
+        """
+        더 이상 '감'과 '경험'에만 의존하는 HR의 시대는 지났습니다.\n
+        조직의 숨겨진 리스크와 기회를 객관적 지표로 증명하고 선제적으로 인재관리를 시작하세요.
+        """
+    )
+
     # Get available proposal categories
     available_categories = get_proposal_categories()
 
@@ -216,19 +226,19 @@ def main():
         return
 
     # First selectbox: Choose proposal category
-    selected_category = st.sidebar.selectbox("Choose a proposal", available_categories)
-    
+    selected_category = st.sidebar.selectbox("그래프 살펴보기", available_categories)
+
     if selected_category:
         # Get available subtypes for the selected category
         available_subtypes = get_proposal_subtypes(selected_category)
-        
+
         if not available_subtypes:
             st.error(f"No subtypes found for proposal: {selected_category}")
             return
-        
+
         # Second selectbox: Choose subtype
-        selected_subtype = st.sidebar.selectbox("Choose type", available_subtypes)
-        
+        selected_subtype = st.sidebar.selectbox("하위 내용 선택", available_subtypes)
+
         if selected_subtype:
             st.title(f"Proposal: {selected_category} - {selected_subtype}")
 
@@ -240,13 +250,15 @@ def main():
 
             # Load and display figure and aggregate_df (not for 개요)
             if selected_subtype != "개요":
-                fig, aggregate_df = load_proposal_data(selected_category, selected_subtype)
+                fig, aggregate_df = load_proposal_data(
+                    selected_category, selected_subtype
+                )
                 if fig is not None:
                     if isinstance(fig, plt.Figure):
                         st.pyplot(fig)
                     elif isinstance(fig, go.Figure):
                         st.plotly_chart(fig)
-                    
+
                     # Display aggregate_df if available
                     if aggregate_df is not None:
                         st.subheader("데이터 테이블")
