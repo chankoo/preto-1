@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit_analytics
 import os
 import importlib.util
 import pandas as pd
@@ -210,69 +211,69 @@ def main():
     """
     Main function to run the Streamlit app.
     """
+    with streamlit_analytics.track():
+        st.sidebar.title("HR Analytics Graph Collection")
+        st.sidebar.markdown(
+            """
+            더 이상 '감'과 '경험'에만 의존하는 HR의 시대는 지났습니다.\n
+            조직의 숨겨진 리스크와 기회를 객관적 지표로 증명하고 선제적으로 인재관리를 시작하세요.
+            """
+        )
 
-    st.sidebar.title("HR Analytics Graph Collection")
-    st.sidebar.markdown(
-        """
-        더 이상 '감'과 '경험'에만 의존하는 HR의 시대는 지났습니다.\n
-        조직의 숨겨진 리스크와 기회를 객관적 지표로 증명하고 선제적으로 인재관리를 시작하세요.
-        """
-    )
+        # Get available proposal categories
+        available_categories = get_proposal_categories()
 
-    # Get available proposal categories
-    available_categories = get_proposal_categories()
-
-    if not available_categories:
-        st.error("No proposals found in the 'PROPOSALS_DIR' directory.")
-        return
-
-    # First selectbox: Choose proposal category
-    selected_category = st.sidebar.selectbox(
-        "그래프 살펴보기", 
-        available_categories,
-        format_func=lambda x: name_dictionary.get(x, x)
-    )
-
-    if selected_category:
-        # Get available subtypes for the selected category
-        available_subtypes = get_proposal_subtypes(selected_category)
-
-        if not available_subtypes:
-            st.error(f"No subtypes found for proposal: {selected_category}")
+        if not available_categories:
+            st.error("No proposals found in the 'PROPOSALS_DIR' directory.")
             return
 
-        # Second selectbox: Choose subtype
-        selected_subtype = st.sidebar.selectbox("하위 내용 선택", available_subtypes)
+        # First selectbox: Choose proposal category
+        selected_category = st.sidebar.selectbox(
+            "그래프 살펴보기", 
+            available_categories,
+            format_func=lambda x: name_dictionary.get(x, x)
+        )
 
-        if selected_subtype:
-            category_display = name_dictionary.get(selected_category, selected_category)
-            st.title(f"{category_display} - {selected_subtype}")
+        if selected_category:
+            # Get available subtypes for the selected category
+            available_subtypes = get_proposal_subtypes(selected_category)
 
-            # Load and display markdown content if available (especially for 개요)
-            md_content = load_markdown_content(selected_category, selected_subtype)
-            if md_content:
-                st.markdown(md_content)
-                st.divider()
+            if not available_subtypes:
+                st.error(f"No subtypes found for proposal: {selected_category}")
+                return
 
-            # Load and display figure and aggregate_df (not for 개요)
-            if selected_subtype != "개요":
-                fig, aggregate_df = load_proposal_data(
-                    selected_category, selected_subtype
-                )
-                if fig is not None:
-                    if isinstance(fig, plt.Figure):
-                        st.pyplot(fig)
-                    elif isinstance(fig, go.Figure):
-                        st.plotly_chart(fig)
+            # Second selectbox: Choose subtype
+            selected_subtype = st.sidebar.selectbox("하위 내용 선택", available_subtypes)
 
-                    # Display aggregate_df if available
-                    if aggregate_df is not None:
-                        st.subheader("데이터 테이블")
-                        st.dataframe(aggregate_df, use_container_width=True)
-                else:
-                    st.write(
-                        "Could not load or find a figure for the selected proposal."
+            if selected_subtype:
+                category_display = name_dictionary.get(selected_category, selected_category)
+                st.title(f"{category_display} - {selected_subtype}")
+
+                # Load and display markdown content if available (especially for 개요)
+                md_content = load_markdown_content(selected_category, selected_subtype)
+                if md_content:
+                    st.markdown(md_content)
+                    st.divider()
+
+                # Load and display figure and aggregate_df (not for 개요)
+                if selected_subtype != "개요":
+                    fig, aggregate_df = load_proposal_data(
+                        selected_category, selected_subtype
                     )
+                    if fig is not None:
+                        if isinstance(fig, plt.Figure):
+                            st.pyplot(fig)
+                        elif isinstance(fig, go.Figure):
+                            st.plotly_chart(fig)
+
+                        # Display aggregate_df if available
+                        if aggregate_df is not None:
+                            st.subheader("데이터 테이블")
+                            st.dataframe(aggregate_df, use_container_width=True)
+                    else:
+                        st.write(
+                            "Could not load or find a figure for the selected proposal."
+                        )
 
 
 if __name__ == "__main__":
