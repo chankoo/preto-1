@@ -4,22 +4,6 @@
 
 - [Docker](https://www.docker.com/get-started)
 
-## 설정
-Jupyter Notebook로 작업한 결과를 streamlit으로 서빙합니다. 이를 위해 jupyter와 streamlit 프로세스를 각각 실행합니다.
-
-```bash
-[start.sh]
-#!/bin/bash
-
-# Set the PYTHONPATH to include the src directory
-export PYTHONPATH="${PYTHONPATH}:/app/src"
-
-# Start Jupyter Notebook using the config file
-jupyter notebook --config=/app/jupyter_notebook_config.py &
-
-# Start Streamlit app
-streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
-```
 
 ## 빌드 및 실행
 
@@ -38,6 +22,22 @@ streamlit run src/app.py --server.port=8501 --server.address=0.0.0.0
     ```sh
     docker run --name hra -d -p 8501:8501 -p 8888:8888 -v "$(pwd)":/app preto-1
     ```
+
+    > **윈도우 사용자 참고 (Note for Windows Users):**
+    >
+    > Windows 환경에서는 `$(pwd)` 대신 현재 디렉토리를 나타내는 명령어로 변경해야 합니다. 사용하시는 셸에 맞는 아래 명령어를 사용하세요.
+    >
+    > - **Command Prompt (CMD):**
+    >   ```cmd
+    >   docker run --name hra -d -p 8501:8501 -p 8888:8888 -v "%cd%":/app preto-1
+    >   ```
+    >
+    > - **PowerShell:**
+    >   ```powershell
+    >   docker run --name hra -d -p 8501:8501 -p 8888:8888 -v "${pwd}:/app" preto-1
+    >   ```
+
+
 
 ## 사용 방법
 

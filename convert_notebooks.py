@@ -1,58 +1,73 @@
 import os
-import glob
 import subprocess
 
-# Get the absolute path of the directory where the script is located
-script_dir = os.path.dirname(os.path.abspath(__file__))
+def convert_notebooks_in_dir(source_root, dest_root):
+    """
+    Recursively finds .ipynb files in source_root, converts them to .py,
+    and saves them in dest_root, preserving the directory structure.
+    """
+    print(f"Starting conversion from '{source_root}' to '{dest_root}'...")
+    for dirpath, _, filenames in os.walk(source_root):
+        for filename in filenames:
+            if filename.endswith(".ipynb"):
+                notebook_full_path = os.path.join(dirpath, filename)
+                
+                # Determine the relative path to maintain directory structure
+                relative_path = os.path.relpath(dirpath, source_root)
+                
+                # For the root, relpath is '.', handle this case
+                if relative_path == ".":
+                    dest_dir = dest_root
+                else:
+                    dest_dir = os.path.join(dest_root, relative_path)
 
-# Define a mapping from source directories to destination directories
-source_dest_map = {
-    os.path.join(script_dir, "notebooks", "tables"): os.path.join(
-        script_dir, "src", "services", "data"
-    ),
-    os.path.join(script_dir, "notebooks", "proposals"): os.path.join(
-        script_dir, "src", "services", "proposals"
-    ),
-}
+                # Ensure the destination directory exists
+                os.makedirs(dest_dir, exist_ok=True)
 
-# Loop through the mapping
-for source_dir, dest_dir in source_dest_map.items():
-    print(f"Searching for notebooks in: {source_dir}")
+                print(f"Converting '{notebook_full_path}'...")
+                try:
+                    # Use jupyter nbconvert to convert the notebook to a python script
+                    subprocess.run(
+                        [
+                            "jupyter",
+                            "nbconvert",
+                            "--to",
+                            "python",
+                            notebook_full_path,
+                            "--output-dir",
+                            dest_dir,
+                        ],
+                        check=True,
+                    )
+                    print(f"  -> Successfully converted to '{dest_dir}'")
+                except subprocess.CalledProcessError as e:
+                    print(f"  -> Error converting {notebook_full_path}: {e}")
+                except FileNotFoundError:
+                    print(
+                        "Error: 'jupyter' command not found. Make sure Jupyter is installed and in your PATH."
+                    )
+                    return # Exit if jupyter is not found
 
-    # Ensure the destination directory exists
-    os.makedirs(dest_dir, exist_ok=True)
+def main():
+    """
+    Main function to define source and destination directories and
+    start the conversion process.
+    """
+    # Get the absolute path of the directory where the script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # Find all .ipynb files in the source directory
-    notebook_files = glob.glob(os.path.join(source_dir, "*.ipynb"))
+    # Run the conversion
+    convert_notebooks_in_dir(
+        source_root=os.path.join(script_dir, "notebooks", "tables"),
+        dest_root=os.path.join(script_dir, "src", "services", "tables"),
+    )
 
-    if not notebook_files:
-        print(f"No notebook files (.ipynb) found in {source_dir}.")
-    else:
-        print(f"Found notebooks: {notebook_files}")
-        for notebook_path in notebook_files:
-            print(f"Converting {notebook_path} to {dest_dir}...")
-            try:
-                # Use jupyter nbconvert to convert the notebook to a python script
-                subprocess.run(
-                    [
-                        "jupyter",
-                        "nbconvert",
-                        "--to",
-                        "python",
-                        notebook_path,
-                        "--output-dir",
-                        dest_dir,
-                    ],
-                    check=True,
-                )
-                print(
-                    f"Successfully converted {notebook_path} to a .py file in '{dest_dir}'"
-                )
-            except subprocess.CalledProcessError as e:
-                print(f"Error converting {notebook_path}: {e}")
-            except FileNotFoundError:
-                print(
-                    "Error: 'jupyter' command not found. Make sure Jupyter is installed and in your PATH."
-                )
+    convert_notebooks_in_dir(
+        source_root=os.path.join(script_dir, "notebooks", "proposals"),
+        dest_root=os.path.join(script_dir, "src", "services", "proposals"),
+    )
 
-print("\nConversion process finished.")
+    print("\nConversion process finished.")
+
+if __name__ == "__main__":
+    main()

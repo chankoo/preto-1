@@ -1,4 +1,5 @@
 streamlit
+streamlit-analytics2
 notebook
 nbconvert
 pandas
